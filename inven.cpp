@@ -24,9 +24,6 @@ struct player{
     int jumlahitem = 0;
 };
 
-const int MAX = 100;
-item inventory[MAX];
-int jumlahData = 0;
 
 player p;
 string namaFile = "inventory.txt";
@@ -137,11 +134,12 @@ void equipment(){
     cout << "\n=== EQUIPMENT ===\n";
     for (int i = 0; i < 4; i++) {
         cout << i + 1 << ". ";
-        if (p.slot[i].kosong)
+        if (p.slot[i].kosong){
             cout << "Kosong\n";
-        else
+        }else{
             cout << p.slot[i].equipment.nama;
             cout << " (Lv." << p.slot[i].equipment.level << ")\n";
+        }
     }
 }
 
@@ -258,6 +256,7 @@ void menu() {
                 break;
             case 2:
                 tambahItem();
+                break;
             case 3: 
                 tampilItem(); 
                 break;
