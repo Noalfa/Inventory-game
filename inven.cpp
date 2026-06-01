@@ -7,9 +7,9 @@ using namespace std;
 
 struct item{
     string nama;
-    string jenis;
+    string tipe;
+    string grade;
     int level;
-    int jumlah;
 };
 
 struct e_slot{
@@ -20,7 +20,7 @@ struct e_slot{
 struct player{
     string nama;
     e_slot slot[4];
-    item inventory[3];
+    item inventory[10];
     int jumlahitem = 0;
 };
 
@@ -31,12 +31,120 @@ int jumlahData = 0;
 player p;
 string namaFile = "inventory.txt";
 
-string namaItemList[] = {"Sword", "Shield", "Potion", "Armor", "Ring"};
-string jenisList[] = {"Weapon", "Defense", "Consumable"};
+string namaItemList[] = {"Sword", "Armor", "Ring"};
+string potionList[] = {"Healing Potion", "Boost Potion"};
 
-void generateRandom(){
+string gradeList[] = {"Copper", "Silver", "Diamond"};
 
+
+void tambahItem() {
+    if (p.jumlahitem >= 10) {
+        cout << "Inventory penuh!\n";
+        return;
+    }
+
+    item baru;
+    int pilih;
+
+    cout << "\n=== TAMBAH ITEM ===\n";
+    cout << "1. Equipment\n";
+    cout << "2. Potion\n";
+    cout << "Pilih tipe: ";
+    cin >> pilih;
+    cin.ignore();
+
+    if (pilih == 1) {
+        baru.tipe = "Equipment";
+
+        cout << "Nama item: ";
+        getline(cin, baru.nama);
+
+        cout << "Grade (Copper/Silver/Diamond): ";
+        getline(cin, baru.grade);
+    }
+    else if (pilih == 2) {
+        baru.tipe = "Potion";
+
+        cout << "Nama potion (Healing Potion / Boost Potion): ";
+        getline(cin, baru.nama);
+
+        baru.grade = "-"; // potion tidak pakai grade
+    }
+    else {
+        cout << "Pilihan tidak valid!\n";
+        return;
+    }
+
+    cout << "Level: ";
+    cin >> baru.level;
+
+    // masuk ke inventory
+    p.inventory[p.jumlahitem] = baru;
+    p.jumlahitem++;
+
+    cout << "Item berhasil ditambahkan!\n";
 }
+
+void generateRandom() {
+    int n;
+    cout << "Jumlah item: ";
+    cin >> n;
+
+    if (n > 10) n = 10;
+
+    srand(time(0));
+    p.jumlahitem = n;
+
+    for (int i = 0; i < n; i++) {
+
+        int tipeRand = rand() % 2;
+
+        if (tipeRand == 0) {
+            // EQUIPMENT
+            p.inventory[i].tipe = "Equipment";
+            p.inventory[i].nama = namaItemList[rand() % 3];
+            p.inventory[i].grade = gradeList[rand() % 3];
+        } else {
+            // POTION
+            p.inventory[i].tipe = "Potion";
+            p.inventory[i].nama = potionList[rand() % 2];
+            p.inventory[i].grade = "-";
+        }
+
+        p.inventory[i].level = rand() % 10 + 1;
+    }
+
+    cout << "Random item dibuat!\n";
+}
+
+void tampilItem(){
+    if (p.jumlahitem == 0) {
+        cout << "Inventory kosong!\n";
+        return;
+    }
+
+    cout << "\n=== INVENTORY ===\n";
+    for (int i = 0; i < p.jumlahitem; i++) {
+        cout << i + 1 << ". ";
+        cout << p.inventory[i].nama << " | ";
+        cout << p.inventory[i].tipe << " | ";
+        cout << p.inventory[i].grade << " | Lv.";
+        cout << p.inventory[i].level << "\n";
+    }
+}
+
+void equipment(){
+    cout << "\n=== EQUIPMENT ===\n";
+    for (int i = 0; i < 4; i++) {
+        cout << i + 1 << ". ";
+        if (p.slot[i].kosong)
+            cout << "Kosong\n";
+        else
+            cout << p.slot[i].equipment.nama;
+            cout << " (Lv." << p.slot[i].equipment.level << ")\n";
+    }
+}
+
 
 //pengubah huruf kecil
 string huruf_kecil(string kata){
@@ -46,21 +154,100 @@ string huruf_kecil(string kata){
     return kata;
 }
 
+void swapItem(item &a, item &b) {
+    item temp = a;
+    a = b;
+    b = temp;
+}
+
+int partitionNama(item arr[], int low, int high) {
+    string pivot = huruf_kecil(arr[high].nama);
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (huruf_kecil(arr[j].nama) < pivot) {
+            i++;
+            swapItem(arr[i], arr[j]);
+        }
+    }
+
+    swapItem(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSortNama(item arr[], int low, int high) {
+    if (low < high) {
+        int pi = partitionNama(arr, low, high);
+
+        quickSortNama(arr, low, pi - 1);
+        quickSortNama(arr, pi + 1, high);
+    }
+}
+
+int partitionLevel(item arr[], int low, int high) {
+    int pivot = arr[high].level;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (arr[j].level < pivot) {
+            i++;
+            swapItem(arr[i], arr[j]);
+        }
+    }
+
+    swapItem(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSortLevel(item arr[], int low, int high) {
+    if (low < high) {
+        int pi = partitionLevel(arr, low, high);
+
+        quickSortLevel(arr, low, pi - 1);
+        quickSortLevel(arr, pi + 1, high);
+    }
+}
+
+void sorting() {
+    if (p.jumlahitem == 0) {
+        cout << "Inventory kosong!\n";
+        return;
+    }
+
+    int pilih;
+    cout << "\n--- SORTING (QUICK SORT) ---\n";
+    cout << "1. Berdasarkan Nama\n";
+    cout << "2. Berdasarkan Level\n";
+    cout << "Pilih: ";
+    cin >> pilih;
+
+    if (pilih == 1) {
+        quickSortNama(p.inventory, 0, p.jumlahitem - 1);
+    } else if (pilih == 2) {
+        quickSortLevel(p.inventory, 0, p.jumlahitem - 1);
+    } else {
+        cout << "Pilihan tidak valid!\n";
+        return;
+    }
+
+    cout << "Sorting selesai (Quick Sort)!\n";
+}
 
 void menu() {
     int pilih;
 
     do {
         cout << "\n===== INVENTORY GAME =====\n";
-        cout << "1. Generate Random\n";
-        cout << "2. Tampilkan Seluruh Item\n";
-        cout << "3. Tampilkan Equio\n";
-        cout << "4. Sorting Item\n";
-        cout << "5. Searching\n";
-        cout << "6. Equip Item\n";
-        cout << "7. Save ke File\n";
-        cout << "8. Load dari File\n";
-        cout << "9. Ganti File\n";
+        cout << "1. Add Item (Generate Random)\n";
+        cout << "2. Add Item (Manual)\n";
+        cout << "3. Tampilkan Seluruh Item\n";
+        cout << "4. Tampilkan Equipment\n";
+        cout << "5. Sorting Item\n";
+        cout << "6. Searching\n";
+        cout << "7. Equip Item\n";
+        cout << "8. Save ke File\n";
+        cout << "9. Load dari File\n";
+        cout << "10. Ganti File\n";
         cout << "0. Keluar\n";
         cout << "Pilih: ";
         cin >> pilih;
@@ -69,23 +256,31 @@ void menu() {
             case 1: 
                 generateRandom(); 
                 break;
-            case 2: 
+            case 2:
+                tambahItem();
+            case 3: 
                 tampilItem(); 
                 break;
-            case 3: 
-                sorting();
-                break;
             case 4: 
-                searchMenu(); 
+                equipment();
                 break;
             case 5: 
-                saveToFile(); 
+                sorting(); 
                 break;
             case 6: 
-                loadFromFile(); 
+               // searching(); 
                 break;
             case 7: 
-                pointerDemo(); 
+               // equipItem(); 
+                break;
+            case 8: 
+               // saveFile(); 
+                break;
+            case 9:
+                //loadFile();
+                break;
+            case 10:
+                //gantiFile();
                 break;
             case 0: cout << "Terima kasih!\n"; break;
             default: cout << "Pilihan salah!\n";
