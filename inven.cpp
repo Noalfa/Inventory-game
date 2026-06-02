@@ -229,16 +229,18 @@ void sorting() {
     cout << "Sorting selesai (Quick Sort)!\n";
 }
 
-int binarySearchNama(string target) {
+int binarySearchNama(item arr[], int jumlah, string target) {
+
     int kiri = 0;
-    int kanan = p.jumlahitem - 1;
+    int kanan = jumlah - 1;
 
     target = huruf_kecil(target);
 
     while (kiri <= kanan) {
+
         int tengah = (kiri + kanan) / 2;
 
-        string namaTengah = huruf_kecil(p.inventory[tengah].nama);
+        string namaTengah = huruf_kecil(arr[tengah].nama);
 
         if (namaTengah == target)
             return tengah;
@@ -252,17 +254,19 @@ int binarySearchNama(string target) {
     return -1;
 }
 
-int binarySearchLevel(int target) {
+int binarySearchLevel(item arr[], int jumlah, int target) {
+
     int kiri = 0;
-    int kanan = p.jumlahitem - 1;
+    int kanan = jumlah - 1;
 
     while (kiri <= kanan) {
+
         int tengah = (kiri + kanan) / 2;
 
-        if (p.inventory[tengah].level == target)
+        if (arr[tengah].level == target)
             return tengah;
 
-        if (p.inventory[tengah].level < target)
+        if (arr[tengah].level < target)
             kiri = tengah + 1;
         else
             kanan = tengah - 1;
@@ -272,9 +276,16 @@ int binarySearchLevel(int target) {
 }
 
 void searching() {
+
     if (p.jumlahitem == 0) {
         cout << "Inventory kosong!\n";
         return;
+    }
+
+    item temp[10];
+
+    for (int i = 0; i < p.jumlahitem; i++) {
+        temp[i] = p.inventory[i];
     }
 
     int pilih;
@@ -288,45 +299,72 @@ void searching() {
 
     if (pilih == 1) {
 
-        quickSortNama(p.inventory, 0, p.jumlahitem - 1);
+        quickSortNama(temp, 0, p.jumlahitem - 1);
 
         string target;
+
         cout << "Masukkan nama item: ";
         getline(cin, target);
 
-        int hasil = binarySearchNama(target);
+        int hasil = binarySearchNama(temp, p.jumlahitem, target);
 
         if (hasil == -1) {
+
             cout << "Item tidak ditemukan!\n";
+
         } else {
+
             cout << "Item ditemukan:\n";
-            cout << p.inventory[hasil].nama << " | ";
-            cout << p.inventory[hasil].tipe << " | ";
-            cout << p.inventory[hasil].grade << " | Lv.";
-            cout << p.inventory[hasil].level << "\n";
+
+            cout << temp[hasil].nama << " | ";
+            cout << temp[hasil].tipe << " | ";
+            cout << temp[hasil].grade << " | Lv.";
+            cout << temp[hasil].level << endl;
         }
 
-    } else if (pilih == 2) {
+    }
+    else if (pilih == 2) {
 
-        quickSortLevel(p.inventory, 0, p.jumlahitem - 1);
+        quickSortLevel(temp, 0, p.jumlahitem - 1);
 
         int level;
+
         cout << "Masukkan level: ";
         cin >> level;
 
-        int hasil = binarySearchLevel(level);
+        int hasil = binarySearchLevel(temp, p.jumlahitem, level);
 
         if (hasil == -1) {
+
             cout << "Item tidak ditemukan!\n";
+
         } else {
-            cout << "Item ditemukan:\n";
-            cout << p.inventory[hasil].nama << " | ";
-            cout << p.inventory[hasil].tipe << " | ";
-            cout << p.inventory[hasil].grade << " | Lv.";
-            cout << p.inventory[hasil].level << "\n";
+
+            cout << "\nItem dengan level tersebut:\n";
+
+            int kiri = hasil;
+
+            while (kiri >= 0 &&
+                   temp[kiri].level == level)
+                kiri--;
+
+            kiri++;
+
+            while (kiri < p.jumlahitem &&
+                   temp[kiri].level == level) {
+
+                cout << temp[kiri].nama << " | ";
+                cout << temp[kiri].tipe << " | ";
+                cout << temp[kiri].grade << " | Lv.";
+                cout << temp[kiri].level << endl;
+
+                kiri++;
+            }
         }
 
-    } else {
+    }
+    else {
+
         cout << "Pilihan tidak valid!\n";
     }
 }
@@ -334,6 +372,7 @@ void searching() {
 void equipItem() {
 
     if (p.jumlahitem == 0) {
+
         cout << "Inventory kosong!\n";
         return;
     }
@@ -341,30 +380,48 @@ void equipItem() {
     tampilItem();
 
     int index;
+
     cout << "\nPilih nomor item yang ingin di-equip: ";
     cin >> index;
 
     index--;
 
     if (index < 0 || index >= p.jumlahitem) {
+
         cout << "Item tidak valid!\n";
         return;
     }
 
     if (p.inventory[index].tipe != "Equipment") {
+
         cout << "Potion tidak bisa di-equip!\n";
         return;
+    }
+
+    for (int i = 0; i < 4; i++) {
+
+        if (!p.slot[i].kosong &&
+            p.slot[i].equipment.nama ==
+            p.inventory[index].nama &&
+            p.slot[i].equipment.level ==
+            p.inventory[index].level) {
+
+            cout << "Item sudah terpasang!\n";
+            return;
+        }
     }
 
     equipment();
 
     int slot;
+
     cout << "Pilih slot (1-4): ";
     cin >> slot;
 
     slot--;
 
     if (slot < 0 || slot >= 4) {
+
         cout << "Slot tidak valid!\n";
         return;
     }
@@ -380,6 +437,7 @@ void saveFile() {
     ofstream file(namaFile.c_str());
 
     if (!file) {
+
         cout << "Gagal membuka file!\n";
         return;
     }
@@ -394,6 +452,21 @@ void saveFile() {
         file << p.inventory[i].level << endl;
     }
 
+    for (int i = 0; i < 4; i++) {
+
+        file << p.slot[i].kosong << "|";
+
+        if (!p.slot[i].kosong) {
+
+            file << p.slot[i].equipment.nama << "|";
+            file << p.slot[i].equipment.tipe << "|";
+            file << p.slot[i].equipment.grade << "|";
+            file << p.slot[i].equipment.level;
+        }
+
+        file << endl;
+    }
+
     file.close();
 
     cout << "Data berhasil disimpan ke ";
@@ -405,12 +478,16 @@ void loadFile() {
     ifstream file(namaFile.c_str());
 
     if (!file) {
+
         cout << "File tidak ditemukan!\n";
         return;
     }
 
     file >> p.jumlahitem;
     file.ignore();
+
+    if (p.jumlahitem > 10)
+        p.jumlahitem = 10;
 
     string temp;
 
@@ -421,7 +498,27 @@ void loadFile() {
         getline(file, p.inventory[i].grade, '|');
 
         getline(file, temp);
+
         p.inventory[i].level = atoi(temp.c_str());
+    }
+
+    for (int i = 0; i < 4; i++) {
+
+        getline(file, temp, '|');
+
+        p.slot[i].kosong = atoi(temp.c_str());
+
+        if (!p.slot[i].kosong) {
+
+            getline(file, p.slot[i].equipment.nama, '|');
+            getline(file, p.slot[i].equipment.tipe, '|');
+            getline(file, p.slot[i].equipment.grade, '|');
+
+            getline(file, temp);
+
+            p.slot[i].equipment.level =
+                atoi(temp.c_str());
+        }
     }
 
     file.close();
@@ -437,6 +534,11 @@ void gantiFile() {
 
     cout << "Masukkan nama file baru : ";
     cin >> namaFile;
+
+    if (namaFile.find(".txt") == string::npos) {
+
+        namaFile += ".txt";
+    }
 
     cout << "File aktif sekarang : ";
     cout << namaFile << endl;

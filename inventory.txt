@@ -1,7 +1,0 @@
-6
-Healing Potion|Potion|-|1
-Armor|Equipment|Silver|2
-Boost Potion|Potion|-|9
-Healing Potion|Potion|-|9
-Sword|Equipment|Silver|10
-a|Equipment|diamond|6
