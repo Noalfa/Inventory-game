@@ -429,6 +429,11 @@ void equipItem() {
     p.slot[slot].equipment = p.inventory[index];
     p.slot[slot].kosong = false;
 
+    for (int i = index; i < p.jumlahitem - 1; i++) {
+    p.inventory[i] = p.inventory[i + 1];
+    }
+    p.jumlahitem--;
+
     cout << "Equipment berhasil dipasang!\n";
 }
 
@@ -542,6 +547,8 @@ void gantiFile() {
 
     cout << "File aktif sekarang : ";
     cout << namaFile << endl;
+
+    loadFile();
 }
 
 void menu() {
