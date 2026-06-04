@@ -453,7 +453,7 @@ void equipItem() {
 
 void saveFile() {
 
-    ofstream file(namaFile.c_str());
+    ofstream file(namaFile);
 
     if (!file) {
 
@@ -494,7 +494,7 @@ void saveFile() {
 
 void loadFile() {
 
-    ifstream file(namaFile.c_str());
+    ifstream file(namaFile);
 
     if (!file) {
 
@@ -518,14 +518,14 @@ void loadFile() {
 
         getline(file, temp);
 
-        p.inventory[i].level = atoi(temp.c_str());
+        p.inventory[i].level = stoi(temp);
     }
 
     for (int i = 0; i < 4; i++) {
 
         getline(file, temp, '|');
 
-        p.slot[i].kosong = atoi(temp.c_str());
+        p.slot[i].kosong = stoi(temp);
 
         if (!p.slot[i].kosong) {
 
@@ -536,7 +536,7 @@ void loadFile() {
             getline(file, temp);
 
             p.slot[i].equipment.level =
-                atoi(temp.c_str());
+                stoi(temp);
         }
     }
 
