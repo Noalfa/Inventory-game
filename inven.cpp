@@ -313,13 +313,27 @@ void searching() {
             cout << "Item tidak ditemukan!\n";
 
         } else {
+            cout << "\nItem ditemukan:\n";
 
-            cout << "Item ditemukan:\n";
+            int kiri = hasil;
 
-            cout << temp[hasil].nama << " | ";
-            cout << temp[hasil].tipe << " | ";
-            cout << temp[hasil].grade << " | Lv.";
-            cout << temp[hasil].level << endl;
+            // geser ke kiri
+            while (kiri >= 0 &&
+                   huruf_kecil(temp[kiri].nama) == huruf_kecil(target)) {
+                kiri--;
+            }
+            kiri++;
+
+            // tampilkan semua
+            while (kiri < p.jumlahitem && huruf_kecil(temp[kiri].nama) == huruf_kecil(target)) {
+
+                cout << temp[kiri].nama << " | ";
+                cout << temp[kiri].tipe << " | ";
+                cout << temp[kiri].grade << " | Lv.";
+                cout << temp[kiri].level << endl;
+
+                kiri++;
+            }
         }
 
     }
@@ -551,55 +565,95 @@ void gantiFile() {
     loadFile();
 }
 
+
+void menuFile(){
+    int pilih;
+    cout << "1. Load File\n";
+    cout << "2. Save File\n";
+    cout << "3. Buat File Baru\n";
+    cout << "Pilih: ";cin >> pilih;
+    switch (pilih){
+    case 1:
+        loadFile();
+        break;
+    case 2:
+        saveFile();
+        break;
+    case 3:
+        gantiFile();
+        break;
+    default:
+        break;
+    }
+}
+
+void menuEquipment(){
+    int pilih;
+    cout << "1. Tampilkan Equipment\n";
+    cout << "2. Pakai Equipment\n";
+    cout << "Pilih: ";cin >> pilih;
+    switch (pilih){
+    case 1:
+        equipment();
+        break;
+    case 2:
+        equipItem();
+        break;
+    default:
+        break;
+    }
+}
+
+void menuAdd(){
+    int pilih;
+    cout << "1. Add Item (Generate Random)\n";
+    cout << "2. Add Item (Manual)\n";
+    cout << "Pilih: ";cin >> pilih;
+    switch (pilih){
+    case 1:
+        generateRandom();
+        break;
+    case 2:
+        tambahItem();
+        break;
+    default:
+        break;
+    }
+}
+
 void menu() {
     int pilih;
 
     do {
         cout << "\n===== INVENTORY GAME =====\n";
-        cout << "1. Add Item (Generate Random)\n";
-        cout << "2. Add Item (Manual)\n";
-        cout << "3. Tampilkan Seluruh Item\n";
-        cout << "4. Tampilkan Equipment\n";
-        cout << "5. Sorting Item\n";
-        cout << "6. Searching\n";
-        cout << "7. Equip Item\n";
-        cout << "8. Save ke File\n";
-        cout << "9. Load dari File\n";
-        cout << "10. Ganti File\n";
+        cout << "1. Add Item\n";
+        cout << "2. Tampilkan Seluruh Item\n";
+        cout << "3. Equipment\n";
+        cout << "4. Sorting Item\n";
+        cout << "5. Searching\n";
+        cout << "6. File\n";
         cout << "0. Keluar\n";
         cout << "Pilih: ";
         cin >> pilih;
 
         switch (pilih) {
             case 1: 
-                generateRandom(); 
+                menuAdd(); 
                 break;
             case 2:
-                tambahItem();
+                tampilItem();
                 break;
-            case 3: 
-                tampilItem(); 
+            case 3:
+                menuEquipment();
                 break;
             case 4: 
-                equipment();
+                sorting();
                 break;
             case 5: 
-                sorting(); 
+                searching(); 
                 break;
             case 6: 
-               searching(); 
-                break;
-            case 7: 
-               equipItem(); 
-                break;
-            case 8: 
-               saveFile(); 
-                break;
-            case 9:
-                loadFile();
-                break;
-            case 10:
-                gantiFile();
+               menuFile(); 
                 break;
             case 0: cout << "Terima kasih!\n"; break;
             default: cout << "Pilihan salah!\n";

@@ -1,0 +1,9 @@
+4
+Sword|Equipment|Diamond|7
+Armor|Equipment|Diamond|7
+Boost Potion|Potion|-|7
+Boost Potion|Potion|-|8
+0|Sword|Equipment|Copper|2
+1|
+1|
+1|
